@@ -5,7 +5,6 @@
 * @license: Licensed under the MIT license. See http://www.opensource.org/licenses/mit-license.php
 * @website: http://www.daterangepicker.com/
 */
-/*piotr*/
 // Follow the UMD template https://github.com/umdjs/umd/blob/master/templates/returnExportsGlobal.js
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
@@ -53,6 +52,7 @@
         this.autoUpdateInput = true;
         this.alwaysShowCalendars = false;
         this.ranges = {};
+        this.floatingStartEndDate = false;
 
         this.opens = 'right';
         if (this.element.hasClass('pull-right'))
@@ -242,6 +242,10 @@
             this.singleDatePicker = options.singleDatePicker;
             if (this.singleDatePicker)
                 this.endDate = this.startDate.clone();
+        }
+
+        if (typeof options.floatingStartEndDate === 'boolean') {
+            this.floatingStartEndDate = options.floatingStartEndDate;
         }
 
         if (typeof options.timePicker === 'boolean')
@@ -1127,6 +1131,11 @@
             this.move();
             this.element.trigger('show.daterangepicker', this);
             this.isShowing = true;
+
+            if (this.floatingStartEndDate) {
+                this.isEndDateClearEnabled = false;
+            }
+
         },
 
         hide: function(e) {
@@ -1331,8 +1340,18 @@
                     var second = this.timePickerSeconds ? parseInt(this.container.find('.left .secondselect').val(), 10) : 0;
                     date = date.clone().hour(hour).minute(minute).second(second);
                 }
-                this.endDate = null;
-                this.setStartDate(date.clone());
+                if (this.floatingStartEndDate) {
+                    if (this.isEndDateClearEnabled) {
+                        this.endDate = null;
+                        this.setEndDate(date.clone());
+                    } else {
+                        this.isEndDateClearEnabled = true;
+                        this.setStartDate(date.clone());
+                    }
+                } else {
+                    this.endDate = null;
+                    this.setStartDate(date.clone());
+                }
             } else if (!this.endDate && date.isBefore(this.startDate)) {
                 //special case: clicking the same date for start/end,
                 //but the time of the end date is before the start date
