@@ -351,7 +351,7 @@
             }
 
             var listLayout = '<div>';
-            listLayout += '<span class="ranges__title">'+ this.locale.quickSelectionDateLabel +'</span>';
+            listLayout += '<div class="ranges__title">'+ this.locale.quickSelectionDateLabel +'</div>';
             listLayout += '<ul>';
             for (range in this.ranges) {
                 listLayout += '<li data-range-key="' + range + '">' + range + '</li>';
