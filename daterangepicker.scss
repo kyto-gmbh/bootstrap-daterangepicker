@@ -443,6 +443,13 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
   margin: 4px;
   text-align: left;
 
+  &__title {
+    display: block;
+    font-size: 14px;
+    padding-left: 18px;
+    padding-bottom: 10px;
+  }
+
   ul {
     list-style: none;
     margin: 0 auto;

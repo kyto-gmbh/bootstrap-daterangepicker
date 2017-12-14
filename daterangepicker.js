@@ -74,6 +74,7 @@
             cancelLabel: 'Cancel',
             weekLabel: 'W',
             customRangeLabel: 'Custom Range',
+            quickSelectionDateLabel: 'Quick Selection',
             daysOfWeek: moment.weekdaysMin(),
             monthNames: moment.monthsShort(),
             firstDay: moment.localeData().firstDayOfWeek()
@@ -349,15 +350,17 @@
                 this.ranges[rangeHtml] = [start, end];
             }
 
-            var list = '<ul>';
+            var listLayout = '<div>';
+            listLayout += '<span class="ranges__title">'+ this.locale.quickSelectionDateLabel +'</span>';
+            listLayout += '<ul>';
             for (range in this.ranges) {
-                list += '<li data-range-key="' + range + '">' + range + '</li>';
+                listLayout += '<li data-range-key="' + range + '">' + range + '</li>';
             }
             if (this.showCustomRangeLabel) {
-                list += '<li data-range-key="' + this.locale.customRangeLabel + '">' + this.locale.customRangeLabel + '</li>';
+                listLayout += '<li data-range-key="' + this.locale.customRangeLabel + '">' + this.locale.customRangeLabel + '</li>';
             }
-            list += '</ul>';
-            this.container.find('.ranges').prepend(list);
+            listLayout += '</ul></div>';
+            this.container.find('.ranges').prepend(listLayout);
         }
 
         if (typeof cb === 'function') {
