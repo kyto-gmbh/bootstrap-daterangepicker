@@ -1,4 +1,4 @@
-*
+/**
 * @version: 2.1.27
 * @author: Dan Grossman http://www.dangrossman.info/
 * @copyright: Copyright (c) 2012-2017 Dan Grossman. All rights reserved.
@@ -1032,9 +1032,11 @@
 
         updateFormInputs: function() {
 
+            //comment out this behaviour according to requested change in AIT-2454
+
             //ignore mouse movements while an above-calendar text input has focus
-            if (this.container.find('input[name=daterangepicker_start]').is(":focus") || this.container.find('input[name=daterangepicker_end]').is(":focus"))
-                return;
+            // if (this.container.find('input[name=daterangepicker_start]').is(":focus") || this.container.find('input[name=daterangepicker_end]').is(":focus"))
+            //     return;
 
             this.container.find('input[name=daterangepicker_start]').val(this.startDate.format(this.locale.format));
             if (this.endDate)
@@ -1632,7 +1634,7 @@
 
             var manager = this
 
-            if (event.keyCode === 13) {
+            if (event.keyCode === 13 && event.target.getAttribute('name') === 'daterangepicker_start') {
                 // Prevent the calendar from being updated twice on Chrome/Firefox/Edge
                 event.preventDefault();
                 this.formInputsChanged(event);
