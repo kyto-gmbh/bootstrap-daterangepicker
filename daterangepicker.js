@@ -1622,13 +1622,8 @@
 
             if (event.keyCode === 13 && event.target.getAttribute('name') === 'daterangepicker_start') {
                 // Prevent the calendar from being updated twice on Chrome/Firefox/Edge
-<<<<<<< HEAD
                 event.preventDefault();
                 this.formInputsChanged(event);
-=======
-                e.preventDefault();
-                this.formInputsChanged(e);
->>>>>>> master
             }
 
             if (event.target.getAttribute('name') === 'daterangepicker_end') {
