@@ -1348,8 +1348,12 @@
                 }
                 if (this.floatingStartEndDate) {
                     if (this.isEndDateClearEnabled) {
-                        this.endDate = null;
-                        this.setEndDate(date.clone());
+                        if(date.isBefore(this.startDate)) {
+                            this.setStartDate(date.clone());
+                        } else {
+                            this.endDate = null;
+                            this.setEndDate(date.clone());
+                        }
                     } else {
                         this.isEndDateClearEnabled = true;
                         this.setStartDate(date.clone());
