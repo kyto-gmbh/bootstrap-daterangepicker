@@ -1030,9 +1030,11 @@
 
         updateFormInputs: function() {
 
+            //comment out this behaviour according to requested change in AIT-2454
+
             //ignore mouse movements while an above-calendar text input has focus
-            if (this.container.find('input[name=daterangepicker_start]').is(":focus") || this.container.find('input[name=daterangepicker_end]').is(":focus"))
-                return;
+            // if (this.container.find('input[name=daterangepicker_start]').is(":focus") || this.container.find('input[name=daterangepicker_end]').is(":focus"))
+            //     return;
 
             this.container.find('input[name=daterangepicker_start]').val(this.startDate.format(this.locale.format));
             if (this.endDate)
@@ -1575,16 +1577,67 @@
 
         },
 
-        formInputsKeydown: function(e) {
+        debounceAction: function (action, wait) {
+
+            var timeout;
+
+            return function() {
+                var context = this, args = arguments;
+                var later = function () {
+                    timeout = null;
+                    action.apply(context, args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+
+        },
+
+        handleInputDateChange: function (dateValue, dateType) {
+
+            var date = moment(dateValue, this.locale.format);
+
+            if (date.isValid()) {
+
+                if (dateType === 'end') {
+                    this.setEndDate(date);
+                }
+
+                if (dateType === 'start') {
+                    this.setStartDate(date);
+                }
+
+                this.updateView();
+            }
+
+        },
+
+        formInputsKeydown: function(event) {
             // This function ensures that if the 'enter' key was pressed in the input, then the calendars
             // are updated with the startDate and endDate.
             // This behaviour is automatic in Chrome/Firefox/Edge but not in IE 11 hence why this exists.
             // Other browsers and versions of IE are untested and the behaviour is unknown.
-            if (e.keyCode === 13) {
+
+            var manager = this
+
+            if (event.keyCode === 13 && event.target.getAttribute('name') === 'daterangepicker_start') {
                 // Prevent the calendar from being updated twice on Chrome/Firefox/Edge
-                e.preventDefault();
-                this.formInputsChanged(e);
+                event.preventDefault();
+                this.formInputsChanged(event);
             }
+
+            if (event.target.getAttribute('name') === 'daterangepicker_end') {
+
+                var allowedInactivityTime = 500;
+                var debouncedInputChangeHandler = this.debounceAction(
+                    function () { return manager.handleInputDateChange(event.target.value, 'end') }, allowedInactivityTime
+                )
+
+                setTimeout(function(){
+                    debouncedInputChangeHandler();
+                }.bind(this), 100)
+            }
+
         },
 
 
