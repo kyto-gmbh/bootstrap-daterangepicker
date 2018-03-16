@@ -539,7 +539,8 @@
             return false;
         },
 
-        updateView: function() {
+        updateView: function(options) {
+
             if (this.timePicker) {
                 this.renderTimePicker('left');
                 this.renderTimePicker('right');
@@ -549,16 +550,23 @@
                     this.container.find('.right .calendar-time select').removeAttr('disabled').removeClass('disabled');
                 }
             }
-            if (this.endDate) {
-                this.container.find('input[name="daterangepicker_end"]').removeClass('active');
-                this.container.find('input[name="daterangepicker_start"]').addClass('active');
-            } else {
-                this.container.find('input[name="daterangepicker_end"]').addClass('active');
-                this.container.find('input[name="daterangepicker_start"]').removeClass('active');
-            }
+
             this.updateMonthsInView();
             this.updateCalendars();
             this.updateFormInputs();
+
+            if (options && options.actionType === 'keyup') {
+                return;
+            }
+
+            if (this.endDate) {
+                this.container.find('input[name="daterangepicker_start"]').addClass('active');
+                this.container.find('input[name="daterangepicker_end"]').removeClass('active');
+            } else {
+                this.container.find('input[name="daterangepicker_start"]').removeClass('active');
+                this.container.find('input[name="daterangepicker_end"]').addClass('active');
+            }
+
         },
 
         updateMonthsInView: function() {
@@ -1607,12 +1615,13 @@
                     this.setStartDate(date);
                 }
 
-                this.updateView();
+                this.updateView({ actionType: 'keyup' });
             }
 
         },
 
         formInputsKeydown: function(event) {
+
             // This function ensures that if the 'enter' key was pressed in the input, then the calendars
             // are updated with the startDate and endDate.
             // This behaviour is automatic in Chrome/Firefox/Edge but not in IE 11 hence why this exists.
