@@ -96,35 +96,36 @@
 
         //html template for the picker UI
         if (typeof options.template !== 'string' && !(options.template instanceof $))
-            options.template = '<div class="daterangepicker dropdown-menu">' +
-                '<div class="calendar left">' +
-                '<div class="daterangepicker_input">' +
-                '<input class="input-mini form-control" type="text" name="daterangepicker_start" value="" />' +
-                '<i class="fa fa-calendar glyphicon glyphicon-calendar"></i>' +
-                '<div class="calendar-time">' +
-                '<div></div>' +
-                '<i class="fa fa-clock-o glyphicon glyphicon-time"></i>' +
-                '</div>' +
-                '</div>' +
-                '<div class="calendar-table"></div>' +
-                '</div>' +
-                '<div class="calendar right">' +
-                '<div class="daterangepicker_input">' +
-                '<input class="input-mini form-control" type="text" name="daterangepicker_end" value="" />' +
-                '<i class="fa fa-calendar glyphicon glyphicon-calendar"></i>' +
-                '<div class="calendar-time">' +
-                '<div></div>' +
-                '<i class="fa fa-clock-o glyphicon glyphicon-time"></i>' +
-                '</div>' +
-                '</div>' +
-                '<div class="calendar-table"></div>' +
-                '</div>' +
-                '<div class="ranges">' +
-                '<div class="range_inputs">' +
-                '<button class="applyBtn" disabled="disabled" type="button"></button> ' +
-                '<button class="cancelBtn" type="button"></button>' +
-                '</div>' +
-                '</div>' +
+            options.template =
+                '<div class="daterangepicker dropdown-menu">' +
+                    '<div class="calendar left">' +
+                        '<div class="daterangepicker_input">' +
+                            '<input class="input-mini form-control" type="text" name="daterangepicker_start" value="" />' +
+                            '<i class="fa fa-calendar glyphicon glyphicon-calendar"></i>' +
+                            '<div class="calendar-time">' +
+                                '<div></div>' +
+                                '<i class="fa fa-clock-o glyphicon glyphicon-time"></i>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="calendar-table"></div>' +
+                    '</div>' +
+                    '<div class="calendar right">' +
+                        '<div class="daterangepicker_input">' +
+                            '<input class="input-mini form-control" type="text" name="daterangepicker_end" value="" />' +
+                            '<i class="fa fa-calendar glyphicon glyphicon-calendar"></i>' +
+                            '<div class="calendar-time">' +
+                                '<div></div>' +
+                                '<i class="fa fa-clock-o glyphicon glyphicon-time"></i>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="calendar-table"></div>' +
+                    '</div>' +
+                    '<div class="ranges">' +
+                        '<div class="range_inputs">' +
+                            '<button class="applyBtn" disabled="disabled" type="button"></button> ' +
+                            '<button class="cancelBtn" type="button"></button>' +
+                        '</div>' +
+                    '</div>' +
                 '</div>';
 
         this.parentEl = (options.parentEl && $(options.parentEl).length) ? $(options.parentEl) : $(this.parentEl);
@@ -442,14 +443,12 @@
 
         if (this.element.is('input') || this.element.is('button')) {
             this.element.on({
-                'click.daterangepicker': $.proxy(this.show, this),
-                'focus.daterangepicker': $.proxy(this.show, this),
+                'click.daterangepicker focus.daterangepicker': $.proxy(this.show, this),
                 'keyup.daterangepicker': $.proxy(this.elementChanged, this),
                 'keydown.daterangepicker': $.proxy(this.keydown, this) //IE 11 compatibility
             });
         } else {
-            this.element.on('click.daterangepicker', $.proxy(this.toggle, this));
-            this.element.on('keydown.daterangepicker', $.proxy(this.toggle, this));
+            this.element.on('click.daterangepicker keydown.daterangepicker', $.proxy(this.toggle, this));
         }
 
         // if attached to a text input, set the initial value
@@ -624,7 +623,7 @@
             // Build the matrix of dates that will populate the calendar
             //
 
-            var calendar = side == 'left' ? this.leftCalendar : this.rightCalendar;
+            var calendar = side === 'left' ? this.leftCalendar : this.rightCalendar;
             var month = calendar.month.month();
             var year = calendar.month.year();
             var hour = calendar.month.hour();
@@ -1112,7 +1111,7 @@
             this.move();
             this.element.trigger('show.daterangepicker', this);
             this.isShowing = true;
-
+            this.startDateInputEl.trigger('focus.daterangepicker');
         },
 
         hide: function(e) {
@@ -1285,8 +1284,13 @@
             // * if single date picker mode, and time picker isn't enabled, apply the selection immediately
             // * if one of the inputs above the calendars was focused, cancel that manual input
             //
-
-            if (this.startDateInputEl.hasClass('active')) { //picking start
+            if (this.singleDatePicker) {
+                this.setStartDate(clickedDate.clone());
+                this.setEndDate(this.startDate);
+                if (!this.timePicker) {
+                    this.clickApply();
+                }
+            } else if (this.startDateInputEl.hasClass('active')) { //picking start
                 if (this.timePicker) {
                     clickedDate = this.deserializeSelectedTime(clickedDate, 'left');
                 }
@@ -1298,9 +1302,6 @@
                     this.endDateInputEl.trigger('focus.daterangepicker', this);
                 }
             } else if (this.endDateInputEl.hasClass('active') && clickedDate.isBefore(this.startDate)) {
-
-                //special case: clicking the same date for start/end,
-                //but the time of the end date is before the start date
                 this.setEndDate(this.startDate.clone());
                 this.setStartDate(clickedDate);
 
@@ -1316,12 +1317,6 @@
                     this.calculateChosenLabel();
                     this.clickApply();
                 }
-            }
-
-            if (this.singleDatePicker) {
-                this.setEndDate(this.startDate);
-                if (!this.timePicker)
-                    this.clickApply();
             }
 
             this.updateView();
